@@ -19,7 +19,6 @@ class MainWindow(BaseMainWindow):
         self.ytilt = QLabel()
         self.pressure = QLabel()
         self.pointer = QLabel()
-        self.debug = QLabel()
 
         with CVBoxLayout(self) as layout:
             layout.add(self.pos)
@@ -29,7 +28,6 @@ class MainWindow(BaseMainWindow):
                 layout.add(QLabel(), 1)
             layout.add(self.pressure)
             layout.add(self.pointer)
-            layout.add(self.debug)
             layout.add(QLabel(), 1)
 
         self.init_statusbar()
@@ -42,12 +40,11 @@ class MainWindow(BaseMainWindow):
         self.status.addWidget(self.network_status)
 
     def tabletEvent(self, event):
-        self.pos.setText(str(event.posF()))
-        self.xtilt.setText(str(event.xTilt()))
-        self.ytilt.setText(str(event.yTilt()))
-        self.pressure.setText(str(event.pressure()))
-        self.pointer.setText(str(event.pointerType()))
-
+        event.accept()
+        print(type(event))
+        # if event.type() == QEvent.TabletPress:
+        # elif event.type() == QEvent.TabletRelease:
+        # elif event.type() == QEvent.TabletMove:
         d = {
             'posF': str(event.posF()),
             'xTilt': str(event.xTilt()),
@@ -55,9 +52,8 @@ class MainWindow(BaseMainWindow):
             'pressure': str(event.pressure()),
             'pointerType': str(event.pointerType()),
         }
-        # self.event_recieved(d)
-        s = json.dumps(d)
-        self.client.send_message(s)
+        self.event_recieved(d)
+        self.client.send_message(json.dumps(d))
 
     def event_recieved(self, msg):
         try:
@@ -66,29 +62,28 @@ class MainWindow(BaseMainWindow):
             self.ytilt.setText(str(msg['yTilt']))
             self.pressure.setText(str(msg['pressure']))
             self.pointer.setText(str(msg['pointerType']))
-            self.debug.setText(str(msg))
         except:
             pass
 
-    def eventFilter(self, obj, event):
-        if event.type() == QEvent.TouchBegin:  # Catch the TouchBegin event.
-            print('We have a touch begin')
-            return True
-        elif event.type() == QEvent.TouchEnd:  # Catch the TouchEnd event.
-            print('We have a touch end')
-            return True
-        elif event.type() == QEvent.TouchUpdate:  # Catch the TouchEnd event.
-            print('We have a touch update')
-            return True
-        elif event.type() == QEvent.MouseButtonPress:
-            d = {
-                'event': 'click',
-            }
+    # def eventFilter(self, obj, event):
+    #     if event.type() == QEvent.TouchBegin:  # Catch the TouchBegin event.
+    #         print('We have a touch begin')
+    #         return True
+    #     elif event.type() == QEvent.TouchEnd:  # Catch the TouchEnd event.
+    #         print('We have a touch end')
+    #         return True
+    #     elif event.type() == QEvent.TouchUpdate:  # Catch the TouchEnd event.
+    #         print('We have a touch update')
+    #         return True
+    #     elif event.type() == QEvent.MouseButtonPress:
+    #         d = {
+    #             'event': 'click',
+    #         }
 
-            self.client.send_message(json.dumps(d))
-            return True
-        elif event.type() == QEvent.MouseMove:
-            print('mouse move')
-            return True
+    #         self.client.send_message(json.dumps(d))
+    #         return True
+    #     elif event.type() == QEvent.MouseMove:
+    #         print('mouse move')
+    #         return True
 
-        return super().eventFilter(obj, event)
+    #     return super().eventFilter(obj, event)
