@@ -18,6 +18,7 @@ class MainWindow(BaseMainWindow):
         self.ytilt = QLabel()
         self.pressure = QLabel()
         self.pointer = QLabel()
+        self.debug = QLabel()
 
         with CVBoxLayout(self) as layout:
             layout.add(self.pos)
@@ -27,6 +28,7 @@ class MainWindow(BaseMainWindow):
                 layout.add(QLabel(), 1)
             layout.add(self.pressure)
             layout.add(self.pointer)
+            layout.add(self.debug)
             layout.add(QLabel(), 1)
 
         self.init_statusbar()
@@ -53,6 +55,7 @@ class MainWindow(BaseMainWindow):
             'pointerType': str(event.pointerType()),
         }
         s = json.dumps(d)
+        self.debug.setText(s)
         self.client.send_message(s)
 
     def event_recieved(msg):
