@@ -6,6 +6,12 @@ class NetworkStatusWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.setObjectName('NetworkStatusBarItem')
+        
+        self.client = QApplication.instance().client
+        self.client.socket.connected.connect(self.client_connected)
+        self.client.socket.disconnected.connect(self.client_disconnected)
+
+        self.server = QApplication.instance().server
 
         self.hosts = []
         disc = QApplication.instance().discovery
@@ -32,8 +38,8 @@ class NetworkStatusWidget(QWidget):
             "Connect at Startup", 
             self, 
             checkable=True, 
-            # checked=bool(self.client.connect_on_startup),
-            # triggered=self.client.toggle_connect_on_startup
+            checked=bool(self.client.connect_on_startup),
+            triggered=self.client.toggle_connect_on_startup
         )
 
         menu = QMenu('', self)
@@ -44,9 +50,9 @@ class NetworkStatusWidget(QWidget):
         for host in self.hosts:
             menu.addAction(QAction(host.hostname, self, triggered=lambda a=host.address: self.connect_client(a)))
 
-        # menu.addSeparator()
-        # for address in self.client.previous_connections:
-        #     menu.addAction(QAction(address, self, triggered=lambda a=address: self.connect_client(a)))
+        menu.addSeparator()
+        for address in self.client.previous_connections:
+            menu.addAction(QAction(address, self, triggered=lambda a=address: self.connect_client(a)))
         
         menu.addSeparator()
         menu.addAction(startup)
@@ -54,7 +60,7 @@ class NetworkStatusWidget(QWidget):
         menu.exec_(event.globalPos())
 
     def client_connected(self):
-        # self.status.setText(self.client.current_connection)
+        self.status.setText(self.client.current_connection)
         self.icon.setPixmap(self.icon_on)
 
     def client_disconnected(self):
@@ -63,9 +69,8 @@ class NetworkStatusWidget(QWidget):
 
     def connect_client(self, address=None):
         self.status.setText("Connecting...")
-        # self.client.disconnect_from_remote()
-        # self.client.connect_to_remote(address)
+        self.client.disconnect_from_remote()
+        self.client.connect_to_remote(address)
 
     def disconnect_client(self):
-        pass
-        # self.client.disconnect_from_remote()
+        self.client.disconnect_from_remote()

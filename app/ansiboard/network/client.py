@@ -11,8 +11,7 @@ class Client(QObject):
   
         self.connect_on_startup = QSettings().value('connect_on_startup', False) == 'true'
         self.current_connection = QSettings().value('current_connection', '10.0.0.207')
-        default_previous_connections = ['ldg.hopto.org', 'daelon.hopto.org', '10.0.0.207']
-        self.previous_connections = QSettings().value('previous_connections', default_previous_connections)
+        self.previous_connections = QSettings().value('previous_connections', [])
         
         self.socket = QWebSocket()
         self.socket.connected.connect(lambda: self.log.info("Connected to server"))
@@ -26,6 +25,13 @@ class Client(QObject):
                 self.previous_connections.append(address)
 
         self.open_socket()
+
+    def disconnect_from_remote(self):
+        self.close_socket()
+
+    def toggle_connect_on_startup(self):
+        self.connect_on_startup = not self.connect_on_startup
+        QSettings().setValue('connect_on_startup', self.connect_on_startup)
         
     def open_socket(self):
         url = f'ws://{self.current_connection}:43000/control'
