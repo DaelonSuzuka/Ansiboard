@@ -42,7 +42,7 @@ class Server(QObject):
         except:
             return
         
-        message_received.emit(msg)
+        self.message_received.emit(msg)
 
     def send_later(self, message):
         QTimer.singleShot(10, lambda: self.client.sendTextMessage(message))

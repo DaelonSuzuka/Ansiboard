@@ -13,7 +13,7 @@ class MainWindow(BaseMainWindow):
         self.client = QApplication.instance().client
         self.server =  QApplication.instance().server
         self.server.message_received.connect(self.event_recieved)
-        
+
         self.pos = QLabel()
         self.xtilt = QLabel()
         self.ytilt = QLabel()
@@ -42,11 +42,11 @@ class MainWindow(BaseMainWindow):
         self.status.addWidget(self.network_status)
 
     def tabletEvent(self, event):
-        # self.pos.setText(str(event.posF()))
-        # self.xtilt.setText(str(event.xTilt()))
-        # self.ytilt.setText(str(event.yTilt()))
-        # self.pressure.setText(str(event.pressure()))
-        # self.pointer.setText(str(event.pointerType()))
+        self.pos.setText(str(event.posF()))
+        self.xtilt.setText(str(event.xTilt()))
+        self.ytilt.setText(str(event.yTilt()))
+        self.pressure.setText(str(event.pressure()))
+        self.pointer.setText(str(event.pointerType()))
 
         d = {
             'posF': str(event.posF()),
@@ -55,17 +55,20 @@ class MainWindow(BaseMainWindow):
             'pressure': str(event.pressure()),
             'pointerType': str(event.pointerType()),
         }
-        self.event_recieved(d)
+        # self.event_recieved(d)
         s = json.dumps(d)
         self.client.send_message(s)
 
-    def event_recieved(msg):
-        self.pos.setText(str(msg['posF']))
-        self.xtilt.setText(str(msg['xTilt']))
-        self.ytilt.setText(str(msg['yTilt']))
-        self.pressure.setText(str(msg['pressure']))
-        self.pointer.setText(str(msg['pointerType']))
-        self.debug.setText(str(msg))
+    def event_recieved(self, msg):
+        try:
+            self.pos.setText(str(msg['posF']))
+            self.xtilt.setText(str(msg['xTilt']))
+            self.ytilt.setText(str(msg['yTilt']))
+            self.pressure.setText(str(msg['pressure']))
+            self.pointer.setText(str(msg['pointerType']))
+            self.debug.setText(str(msg))
+        except:
+            pass
 
     def eventFilter(self, obj, event):
         if event.type() == QEvent.TouchBegin:  # Catch the TouchBegin event.
