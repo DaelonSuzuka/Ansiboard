@@ -41,25 +41,30 @@ class Canvas(QWidget):
         event.accept()
         if event.type() == QEvent.TabletPress:
             data['event'] = 'press'
-            data['type'] = event.pointerType()
+            if event.pointerType() == QTabletEvent.PointerType.Pen:
+                data['type'] = 'pen'
+            elif event.pointerType() == QTabletEvent.PointerType.Eraser:
+                data['type'] = 'eraser'
+
         elif event.type() == QEvent.TabletMove:
             data['event'] = 'move'
         elif event.type() == QEvent.TabletRelease:
             data['event'] = 'release'
 
-        data['pos'] = event.posF()
+        data['posx'] = event.posF().x()
+        data['posy'] = event.posF().y()
         self.receive_data(data)
         self.client.send_message(json.dumps(data))
 
     def receive_data(self, data):
         if data['event'] == 'press':
-            if data['type'] == QTabletEvent.PointerType.Pen:
+            if data['type'] == 'pen':
                 self.stroke = QPainterPath()
-                self.stroke.moveTo(data['pos'])
+                self.stroke.moveTo(data['posx'], data['posy'])
                 self.update()
         if data['event'] == 'move':
             if self.stroke:
-                self.stroke.lineTo(data['pos'])
+                self.stroke.lineTo(data['posx'], data['posy'])
                 self.update()
         if data['event'] == 'release':
             if self.stroke:
