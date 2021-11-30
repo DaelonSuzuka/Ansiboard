@@ -3,6 +3,7 @@ from qtpy.QtNetwork import *
 from qtpy.QtWebSockets import *
 from urllib.parse import urlparse
 from .utils import get_ip
+import json
 
 import logging
 

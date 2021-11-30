@@ -2,15 +2,16 @@ from qtstrap import *
 from qtpy.QtNetwork import *
 from qtpy.QtWebSockets import *
 from urllib.parse import urlparse
+import json
 
 import logging
 
 class Server(QObject):
+    message_received = Signal(dict)
+
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.log = logging.getLogger(__name__)
-
-        self.cb = None
 
         self.server = QWebSocketServer('server-name', QWebSocketServer.NonSecureMode)
         self.client = None
@@ -40,9 +41,8 @@ class Server(QObject):
             msg = json.loads(message)
         except:
             return
-
-        if self.cb:
-            self.cb(msg)
+        
+        message_received.emit(msg)
 
     def send_later(self, message):
         QTimer.singleShot(10, lambda: self.client.sendTextMessage(message))
