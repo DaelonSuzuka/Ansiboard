@@ -1,7 +1,7 @@
 from qtstrap import *
 import qtawesome as qta
 from ansiboard.network import NetworkStatusWidget
-
+import json
 
 class MainWindow(BaseMainWindow):
     def __init__(self, parent=None):
@@ -9,6 +9,9 @@ class MainWindow(BaseMainWindow):
         self.setAttribute(Qt.WA_AcceptTouchEvents, True)
         self.installEventFilter(self)
         self.network_status = NetworkStatusWidget(self)
+
+        self.client = QApplication.instance().client
+        QApplication.instance().server.cb = self.event_recieved
 
         self.pos = QLabel()
         self.xtilt = QLabel()
@@ -33,8 +36,6 @@ class MainWindow(BaseMainWindow):
         self.status.setContextMenuPolicy(Qt.PreventContextMenu)
         
         self.status.add_spacer()
-        
-
         self.status.addWidget(self.network_status)
 
     def tabletEvent(self, event):
@@ -44,9 +45,22 @@ class MainWindow(BaseMainWindow):
         self.pressure.setText(str(event.pressure()))
         self.pointer.setText(str(event.pointerType()))
 
-    # def touchEvent(self, event):
-    #     print(event)
+        d = {
+            'posF': event.posF(),
+            'xTilt': event.xTilt(),
+            'yTilt': event.yTilt(),
+            'pressure': event.pressure(),
+            'pointerType': event.pointerType(),
+        }
+        s = json.dumps(d)
+        self.client.send_message(s)
 
+    def event_recieved(msg):
+        self.pos.setText(str(msg['posF']))
+        self.xtilt.setText(str(msg['xTilt']))
+        self.ytilt.setText(str(msg['yTilt']))
+        self.pressure.setText(str(msg['pressure']))
+        self.pointer.setText(str(msg['pointerType']))
 
     def eventFilter(self, obj, event):
         if event.type() == QEvent.TouchBegin:  # Catch the TouchBegin event.

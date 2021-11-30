@@ -10,6 +10,8 @@ class Server(QObject):
         super().__init__(parent=parent)
         self.log = logging.getLogger(__name__)
 
+        self.cb = None
+
         self.server = QWebSocketServer('server-name', QWebSocketServer.NonSecureMode)
         self.client = None
         self.sockets = {}
@@ -38,6 +40,9 @@ class Server(QObject):
             msg = json.loads(message)
         except:
             return
+
+        if self.cb:
+            self.cb(msg)
 
     def send_later(self, message):
         QTimer.singleShot(10, lambda: self.client.sendTextMessage(message))
