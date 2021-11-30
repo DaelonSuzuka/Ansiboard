@@ -7,7 +7,7 @@ class MainWindow(BaseMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.setAttribute(Qt.WA_AcceptTouchEvents, True)
-        
+        self.installEventFilter(self)
         self.network_status = NetworkStatusWidget(self)
 
         self.pos = QLabel()
@@ -44,5 +44,16 @@ class MainWindow(BaseMainWindow):
         self.pressure.setText(str(event.pressure()))
         self.pointer.setText(str(event.pointerType()))
 
-    def touchEvent(self, event):
-        print(event)
+    # def touchEvent(self, event):
+    #     print(event)
+
+
+    def eventFilter(self, obj, event):
+        if event.type() == QEvent.TouchBegin:  # Catch the TouchBegin event.
+            print('We have a touch begin')
+            return True
+        elif event.type() == QEvent.TouchEnd:  # Catch the TouchEnd event.
+            print('We have a touch end')
+            return True
+
+        return super(MyMainWindow, self).eventFilter(obj, event)
