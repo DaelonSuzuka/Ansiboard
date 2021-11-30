@@ -16,6 +16,10 @@ class Client(QObject):
         self.socket = QWebSocket()
         self.socket.connected.connect(lambda: self.log.info("Connected to server"))
         self.socket.textMessageReceived.connect(self.process_message)
+    
+        if self.connect_on_startup:
+            if urlparse(self.current_connection).path != urlparse(get_ip()).path:
+                self.connect_to_remote()
 
     def connect_to_remote(self, address=None):
         if address is not None:
