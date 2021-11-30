@@ -56,4 +56,4 @@ class MainWindow(BaseMainWindow):
             print('We have a touch end')
             return True
 
-        return super(MyMainWindow, self).eventFilter(obj, event)
+        return super().eventFilter(obj, event)
