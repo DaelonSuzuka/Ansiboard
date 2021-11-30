@@ -1,6 +1,7 @@
 from qtstrap import *
 from qtpy.QtNetwork import *
 from qtpy.QtWebSockets import *
+from urllib.parse import urlparse
 
 import logging
 
