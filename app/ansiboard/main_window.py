@@ -46,11 +46,11 @@ class MainWindow(BaseMainWindow):
         self.pointer.setText(str(event.pointerType()))
 
         d = {
-            'posF': event.posF(),
-            'xTilt': event.xTilt(),
-            'yTilt': event.yTilt(),
-            'pressure': event.pressure(),
-            'pointerType': event.pointerType(),
+            'posF': str(event.posF()),
+            'xTilt': str(event.xTilt()),
+            'yTilt': str(event.yTilt()),
+            'pressure': str(event.pressure()),
+            'pointerType': str(event.pointerType()),
         }
         s = json.dumps(d)
         self.client.send_message(s)
